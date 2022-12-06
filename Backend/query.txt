@@ -9,3 +9,4 @@ create table users (
   email varchar(255) unique not null
 );
   
+  
