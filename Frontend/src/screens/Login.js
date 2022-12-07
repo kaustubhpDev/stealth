@@ -2,6 +2,7 @@ import React from 'react'
 import Carousel from 'react-material-ui-carousel'
 import { Paper, Button, Input, TextField, ButtonGroup, ToggleButtonGroup, ToggleButton } from '@mui/material'
 import img from "../img/img.jpg"
+import back_img from "../img/sign_up_page_background_graphic.svg"
 import CarouselCard from '../components/CarouselCard'
 import { Link } from 'react-router-dom'
 
@@ -26,10 +27,10 @@ const Login = () => {
     return (
         <div className='login'>
             <div className='login_info'
-            // style={{
-            //     backgroundImage: `url(${img})`, backgroundRepeat: "no-repeat",
-            //     backgroundSize: "contain", objectFit: "contain"
-            // }}
+                style={{
+                    backgroundImage: `url(${back_img})`, backgroundRepeat: "no-repeat",
+                    backgroundSize: "contain", objectFit: "contain"
+                }}
             >
                 <section className='logo'>
                     <h2>Company logo</h2>
