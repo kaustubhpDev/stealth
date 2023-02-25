@@ -1,7 +1,7 @@
 const { Pool } = require("pg");
 const client = require("../../config/dbConfig");
 
-exports.test = async (req, res) => {
+exports.getQuestions = async (req, res) => {
   const domain_name = req.query.domain_name;
   const level = req.query.level;
 
@@ -35,3 +35,31 @@ exports.test = async (req, res) => {
     }
   });
 };
+
+exports.addQuestions = async (req, res) => {
+  try {
+    // Extract the data from the request body
+    const { questionLevel, questionValue, domainName } = req.body;
+
+    // Look up the domain ID corresponding to the provided domain name
+    const result = await pool.query(
+      "SELECT domain_id FROM domains WHERE domain_name = $1",
+      [domainName]
+    );
+    const domainId = result.rows[0].domain_id;
+
+    // Insert the new row into the table
+    const newresult = await pool.query(
+      "INSERT INTO questions (question_level, question_value, domain_id) VALUES ($1, $2, $3) RETURNING *",
+      [questionLevel, questionValue, domainId]
+    );
+
+    // Return the inserted row to the client
+    res.json(newresult.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error inserting new question" });
+  }
+};
+
+async function addQuestion(req, res) {}

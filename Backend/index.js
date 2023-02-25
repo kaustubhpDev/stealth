@@ -7,8 +7,11 @@ const client = require("./config/dbConfig");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//routes
+require("./routes/auth.routes")(app);
+
 app.listen(port, () => {
-  console.log(`server running on port ${port}.`);
+  console.log(`server is running on port ${port}.`);
 });
 
 client.connect((err) => {
@@ -19,5 +22,5 @@ client.connect((err) => {
   }
 });
 app.get("/", (request, response) => {
-  response.json({ message: "hey , i am running" });
+  response.json({ message: "hey , i'm uplevel's server" });
 });
