@@ -18,7 +18,7 @@ client.connect((err) => {
   if (err) {
     console.log(err);
   } else {
-    console.log("connected");
+    console.log(" db connected ");
   }
 });
 app.get("/", (request, response) => {
