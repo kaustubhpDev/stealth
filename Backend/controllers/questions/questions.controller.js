@@ -1,4 +1,3 @@
-const { Pool } = require("pg");
 const client = require("../../config/dbConfig");
 
 exports.getQuestions = async (req, res) => {
@@ -27,13 +26,12 @@ exports.getQuestions = async (req, res) => {
   // add the sorting condition to the query
   query += `order by d.name asc,q.text desc`;
 
-  Pool.query(query, values, (err, result) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else {
-      res.status(200).send({ message: result.rows });
-    }
-  });
+  try {
+    const result = await client.query(query, values);
+    res.status(200).send({ message: result.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
 exports.addQuestions = async (req, res) => {
@@ -42,14 +40,14 @@ exports.addQuestions = async (req, res) => {
     const { questionLevel, questionValue, domainName } = req.body;
 
     // Look up the domain ID corresponding to the provided domain name
-    const result = await pool.query(
+    const result = await client.query(
       "SELECT domain_id FROM domains WHERE domain_name = $1",
       [domainName]
     );
     const domainId = result.rows[0].domain_id;
 
     // Insert the new row into the table
-    const newresult = await pool.query(
+    const newresult = await client.query(
       "INSERT INTO questions (question_level, question_value, domain_id) VALUES ($1, $2, $3) RETURNING *",
       [questionLevel, questionValue, domainId]
     );
@@ -62,4 +60,6 @@ exports.addQuestions = async (req, res) => {
   }
 };
 
-async function addQuestion(req, res) {}
+async function addQuestion(req, res) {
+  // Implementation of addQuestion function
+}

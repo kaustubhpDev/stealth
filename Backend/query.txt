@@ -9,4 +9,33 @@ create table users (
   email varchar(255) unique not null
 );
   
+  const { Client } = require('pg');
+
+// controller function to add a user profile
+async function addUserProfile(req, res) {
+  const { username, user_description, address, linkedin_profile, portfolio, location, skills, job_type, work_location, company_size } = req.body;
+  const email = req.user.email; // assuming you have a user authentication middleware that sets the user email in the request object
+
+  const client = new Client();
+  await client.connect();
   
+  try {
+    // get the user id for the given email address
+    const userResult = await client.query('SELECT id FROM users WHERE email = $1', [email]);
+    const userId = userResult.rows[0].id;
+
+    // insert the user profile data into the database
+    const result = await client.query('INSERT INTO user_profiles (username, user_description, address, linkedin_profile, portfolio, location, skills, job_type, work_location, company_size, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *', [username, user_description, address, linkedin_profile, portfolio, location, skills, job_type, work_location, company_size, userId]);
+
+    res.status(201).json(result.rows[0]); // return the inserted row as JSON
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error adding user profile' });
+  } finally {
+    await client.end();
+  }
+}
+
+module.exports = {
+  addUserProfile,
+};
