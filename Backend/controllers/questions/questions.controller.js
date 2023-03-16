@@ -62,4 +62,30 @@ exports.addQuestions = async (req, res) => {
 
 async function addQuestion(req, res) {
   // Implementation of addQuestion function
+  try {
+    const {
+      question_value,
+      question_answer,
+      question_options,
+      question_domain,
+      question_level,
+    } = req.body;
+
+    const insertQuery =
+      "INSERT INTO questions (question_value, question_answer, question_options, question_domain, question_level) VALUES ($1, $2, $3, $4, $5) RETURNING *";
+    const values = [
+      questionValue,
+      questionAnswer,
+      questionOptions,
+      questionDomain,
+      questionLevel,
+    ];
+
+    const queryResult = await client.query(insertQuery, values);
+    const { question_id } = queryResult.rows[0];
+    res.status(201).json({ message: "Question created successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 }
