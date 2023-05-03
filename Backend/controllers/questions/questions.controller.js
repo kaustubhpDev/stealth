@@ -34,26 +34,31 @@ exports.getQuestions = async (req, res) => {
   }
 };
 
-exports.addQuestions = async (req, res) => {
+exports.addQuestion = async (req, res) => {
   try {
     // Extract the data from the request body
-    const { questionLevel, questionValue, domainName } = req.body;
-
-    // Look up the domain ID corresponding to the provided domain name
-    const result = await client.query(
-      "SELECT domain_id FROM domains WHERE domain_name = $1",
-      [domainName]
-    );
-    const domainId = result.rows[0].domain_id;
+    const {
+      questionLevel,
+      questionValue,
+      domainName,
+      questionOptions,
+      questionAnswer,
+    } = req.body;
 
     // Insert the new row into the table
-    const newresult = await client.query(
-      "INSERT INTO questions (question_level, question_value, domain_id) VALUES ($1, $2, $3) RETURNING *",
-      [questionLevel, questionValue, domainId]
+    const newQuestion = await client.query(
+      "INSERT INTO questions (question_level, question_value, question_answer,question_options,question_domain) VALUES ($1, $2, $3,$4,$5) RETURNING *",
+      [
+        questionLevel,
+        questionValue,
+        questionAnswer,
+        questionOptions,
+        domainName,
+      ]
     );
 
     // Return the inserted row to the client
-    res.json(newresult.rows[0]);
+    res.json(newQuestion.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error inserting new question" });
