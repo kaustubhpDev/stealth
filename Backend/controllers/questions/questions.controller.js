@@ -37,24 +37,12 @@ exports.getQuestions = async (req, res) => {
 exports.addQuestion = async (req, res) => {
   try {
     // Extract the data from the request body
-    const {
-      questionLevel,
-      questionValue,
-      domainName,
-      questionOptions,
-      questionAnswer,
-    } = req.body;
+    const { question, level, domain, options, answer } = req.body;
 
     // Insert the new row into the table
     const newQuestion = await client.query(
       "INSERT INTO questions (question_level, question_value, question_answer,question_options,question_domain) VALUES ($1, $2, $3,$4,$5) RETURNING *",
-      [
-        questionLevel,
-        questionValue,
-        questionAnswer,
-        questionOptions,
-        domainName,
-      ]
+      [level, question, answer, options, domain]
     );
 
     // Return the inserted row to the client

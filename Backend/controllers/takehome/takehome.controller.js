@@ -3,6 +3,7 @@ const uploadfile = require("./uploadfile");
 
 exports.savetakehomeassignment = async (req, res) => {
   try {
+    const { name, domain, level } = req.body;
     const { file } = req;
     const url = await uploadfile(file.path);
     const insertQuery = "INSERT INTO assignments (url) VALUES ($1) RETURNING *";
