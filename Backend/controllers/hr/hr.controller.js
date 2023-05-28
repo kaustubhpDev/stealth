@@ -39,42 +39,6 @@ exports.createJob = async (req, res) => {
   }
 };
 
-exports.interviewCandidate = async (req, res) => {
-  try {
-    const {
-      user_id,
-      job_id,
-      interview_date,
-      interview_round,
-      interview_result,
-    } = req.body;
-
-    const query = `
-      INSERT INTO interviewed_candidates (user_id, job_id, interview_date, interview_round, interview_result)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
-    `;
-
-    const values = [
-      user_id,
-      job_id,
-      interview_date,
-      interview_round,
-      interview_result,
-    ];
-
-    const result = await pool.query(query, values);
-    const candidate = result.rows[0];
-
-    res
-      .status(201)
-      .json({ message: "Candidate interviewed successfully", candidate });
-  } catch (error) {
-    console.error("Error interviewing candidate:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
 exports.saveInterviewedCandidate = async (req, res) => {
   try {
     const {

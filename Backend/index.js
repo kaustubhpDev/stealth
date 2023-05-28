@@ -22,6 +22,8 @@ app.use(cors());
 require("./routes/auth.routes")(app);
 require("./routes/question.routes")(app);
 require("./routes/takehome.routes")(app);
+require("./routes/hrauth.routes")(app);
+require("./routes/hrauth.routes")(app);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}.`);
