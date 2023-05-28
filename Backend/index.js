@@ -5,15 +5,23 @@ const app = express();
 const cors = require("cors");
 const port = 8081;
 const client = require("./config/dbConfig");
+const server = require("http").createServer(app);
 
 //app definitions
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(
+  bodyParser.urlencoded({
+    limit: "50mb",
+    extended: true,
+    parameterLimit: 50000,
+  })
+);
 app.use(cors());
 
 //routes
 require("./routes/auth.routes")(app);
 require("./routes/question.routes")(app);
+require("./routes/takehome.routes")(app);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}.`);

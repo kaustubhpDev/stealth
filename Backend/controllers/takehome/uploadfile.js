@@ -12,15 +12,18 @@ const opts = {
   resource_type: "auto",
 };
 
-module.exports = async (filepath) => {
+module.exports = async (pdf) => {
   try {
-    const result = await cloudinary.uploader.upload(filepath, {
+    const result = await cloudinary.uploader.upload(pdf, {
       ...opts,
       timeout: 300000,
     });
+    console.log(`result - ${result}`);
+    console.log(result.secure_url);
     return result.secure_url;
   } catch (error) {
     console.log(`Error -${error}`);
+    console.log(error);
     throw { message: error.message };
   }
 };
