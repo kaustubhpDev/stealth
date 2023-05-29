@@ -11,6 +11,8 @@ module.exports = (app) => {
   router.post("/hr/login", function (req, res) {
     hr.login(req, res);
   });
-
+  router.post("/hr/verifyhr", function (req, res) {
+    hr.verifyhr(req, res);
+  });
   app.use("/api", router);
 };

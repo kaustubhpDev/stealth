@@ -61,7 +61,7 @@ exports.login = async (req, res) => {
   }
 };
 exports.verifyuser = async (req, res) => {
-  const token = req.headers.authorization;
+  const token = req.headers["x-access-token"];
 
   try {
     console.log(token);
