@@ -60,3 +60,13 @@ exports.login = async (req, res) => {
     return res.status(500).send({ message: "Database Error" });
   }
 };
+
+exports.verifyUser = async (req, res) => {
+  const email = req.user.email
+
+  const user = await client.query(`select * from users where email = $1`, [
+    email,
+  ])
+}
+
+
