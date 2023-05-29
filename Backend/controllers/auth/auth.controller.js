@@ -44,7 +44,7 @@ exports.login = async (req, res) => {
       return res.status(404).send({ message: "User not found" });
     }
     const user = result.rows[0];
-    const usrname = user.username;
+    const username = user.username;
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -61,9 +61,10 @@ exports.login = async (req, res) => {
   }
 };
 exports.verifyuser = async (req, res) => {
-  const token = req.headers.authorization.split(" ")[1];
+  const token = req.headers.authorization;
 
   try {
+    console.log(token);
     const decodedToken = jwt.verify(token, config.secret);
     const userId = decodedToken.userId;
 
