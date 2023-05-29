@@ -47,8 +47,8 @@ exports.login = async (req, res) => {
   }
 };
 exports.verifyhr = async (req, res) => {
-  const token = req.headers["x-access-token"];
-
+  const token =
+    req.body.token || req.query.token || req.headers["x-access-token"];
   try {
     const decodedToken = jwt.verify(token, config.secret);
     const hrId = decodedToken.hrId;

@@ -61,8 +61,8 @@ exports.login = async (req, res) => {
   }
 };
 exports.verifyuser = async (req, res) => {
-  const token = req.headers["x-access-token"];
-
+  const token =
+    req.body.token || req.query.token || req.headers["x-access-token"];
   try {
     console.log(token);
     const decodedToken = jwt.verify(token, config.secret);
