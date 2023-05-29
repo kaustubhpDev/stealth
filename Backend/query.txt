@@ -39,3 +39,44 @@ async function addUserProfile(req, res) {
 module.exports = {
   addUserProfile,
 };
+
+
+CREATE TABLE skills (
+  id SERIAL PRIMARY KEY,
+  skill VARCHAR(255) NOT NULL,
+  role VARCHAR(255) NOT NULL,
+  willing_role VARCHAR(255) NOT NULL,
+  user_id INTEGER REFERENCES users(id) NOT NULL
+);
+ create table experience(
+ id serial primary key,
+	company_name varchar(255) not null,
+	 job_title varchar(255) not null,
+	 start_date varchar(255) not null,
+	 end_date varchar(255) not null,
+	 job_description varchar(255) not null,
+	   user_id INTEGER REFERENCES users(id) NOT NULL
+
+	 
+ );
+  create table education(
+ id serial primary key,
+	 	  degree_name varchar(255) not null,
+	college_name varchar(255) not null,
+	 start_date varchar(255) not null,
+	 end_date varchar(255) not null,
+	   user_id INTEGER REFERENCES users(id) NOT NULL
+
+	 
+ );
+  create table preferences(
+ id serial primary key,
+	job_seeking varchar(255) not null,
+	job_type varchar(255) not null,
+	 job_location varchar(255) not null,
+	 company_size varchar(255) not null,
+	desired_salary varchar(255) not null,
+	   user_id INTEGER REFERENCES users(id) NOT NULL
+
+	 
+ );

@@ -44,41 +44,14 @@ exports.addQuestion = async (req, res) => {
       "INSERT INTO questions (question_level, question_value, question_answer,question_options,question_domain) VALUES ($1, $2, $3,$4,$5) RETURNING *",
       [level, question, answer, options, domain]
     );
-
+    const res = newQuestion.rows[0];
     // Return the inserted row to the client
-    res.json(newQuestion.rows[0]);
+    res.json({
+      message: "saved",
+      res: res,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error inserting new question" });
   }
 };
-
-async function addQuestion(req, res) {
-  // Implementation of addQuestion function
-  try {
-    const {
-      question_value,
-      question_answer,
-      question_options,
-      question_domain,
-      question_level,
-    } = req.body;
-
-    const insertQuery =
-      "INSERT INTO questions (question_value, question_answer, question_options, question_domain, question_level) VALUES ($1, $2, $3, $4, $5) RETURNING *";
-    const values = [
-      questionValue,
-      questionAnswer,
-      questionOptions,
-      questionDomain,
-      questionLevel,
-    ];
-
-    const queryResult = await client.query(insertQuery, values);
-    const { question_id } = queryResult.rows[0];
-    res.status(201).json({ message: "Question created successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-}

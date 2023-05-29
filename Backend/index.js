@@ -8,6 +8,7 @@ const client = require("./config/dbConfig");
 const server = require("http").createServer(app);
 require("dotenv").config();
 const { connection } = require("./config/Db");
+const mongoose = require("mongoose");
 // const auth = require("./routes/userRoutes");
 const chat = require("./routes/messageRoutes");
 
@@ -29,7 +30,8 @@ require("./routes/auth.routes")(app);
 require("./routes/question.routes")(app);
 require("./routes/takehome.routes")(app);
 require("./routes/hrauth.routes")(app);
-require("./routes/hrauth.routes")(app);
+require("./routes/hr.routes")(app);
+require("./routes/profile.routes")(app);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`), connection();
