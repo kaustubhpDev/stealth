@@ -5,8 +5,6 @@ require("dotenv").config();
 const config = require("../../config/authConfig");
 
 exports.signup = async (req, res) => {
-  const firstname = req.body.firstname;
-  const lastname = req.body.lastname;
   const username = req.body.username;
   const password = req.body.password;
   const email = req.body.email;
@@ -15,8 +13,6 @@ exports.signup = async (req, res) => {
   const hash = await bcrypt.hash(password, 10);
 
   const user = {
-    firstname,
-    lastname,
     username,
     password: hash,
     email,
@@ -24,10 +20,10 @@ exports.signup = async (req, res) => {
 
   try {
     await client.query(
-      `insert into users (firstname,lastname,username,password,email) values($1,$2,$3,$4,$5);`,
-      [user.firstname, user.lastname, user.username, user.password, user.email]
+      `INSERT INTO users (username, password, email) VALUES ($1, $2, $3);`,
+      [user.username, user.password, user.email]
     );
-    res.status(200).send({ message: "Yayy , you are registered" });
+    res.status(200).send({ message: "Yayy, you are registered" });
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Database Error" });
