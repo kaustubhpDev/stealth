@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).send({ message: "Incorrect password" });
     }
-    const token = jwt.sign({ hrId: hr.id, email: hr.email }, config.secret);
+    const token = jwt.sign({ hrId: hr.id, email: hr.email }, process.env.JWT_SECRET);
     return res.status(200).send({ token });
   } catch (err) {
     console.log(err);

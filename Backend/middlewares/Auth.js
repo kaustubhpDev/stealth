@@ -27,6 +27,28 @@ exports.isAuthenticatedUser = CatchAsyncError(async (req, res, next) => {
     return next();
 
 })
+exports.isAuthenticatedHR = CatchAsyncError(async (req, res, next) => {
+    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+    if (!token) {
+        return res.status(403).send('A token is required for authentication');
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.userId;
+
+        const result = await client.query(`SELECT * FROM hr WHERE id = $1`, [
+            userId,
+        ]);
+        if (result.rows.length === 0) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        req.user = result.rows[0];
+    } catch (err) {
+        return res.status(401).send(err.message);
+    }
+    return next();
+
+})
 
 
 exports.authorizeRoles = (...roles) => {
