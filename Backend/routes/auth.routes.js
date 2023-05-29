@@ -8,6 +8,9 @@ module.exports = (app) => {
   router.post("/login", function (req, res) {
     auth.login(req, res);
   });
+  router.post("/verifyuser", function (req, res) {
+    auth.verifyuser(req, res);
+  });
 
   app.use("/api", router);
 };

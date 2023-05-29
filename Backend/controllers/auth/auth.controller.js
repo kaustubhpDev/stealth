@@ -44,19 +44,45 @@ exports.login = async (req, res) => {
       return res.status(404).send({ message: "User not found" });
     }
     const user = result.rows[0];
-    const firstname = user.firstname;
-    const lastname = user.lastname;
+    const usrname = user.username;
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).send({ message: "Incorrect password" });
     }
     const token = jwt.sign(
-      { userId: user.id, firstName: user.firstname, lastName: user.lastname },
+      { userId: user.id, username: user.username },
       config.secret
     );
-    return res.status(200).send({ token, firstname, lastname });
+    return res.status(200).send({ token, username });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: "Database Error" });
+  }
+};
+exports.verifyuser = async (req, res) => {
+  const token = req.headers.authorization.split(" ")[1];
+
+  try {
+    const decodedToken = jwt.verify(token, config.secret);
+    const userId = decodedToken.userId;
+
+    const result = await client.query(`SELECT * FROM users WHERE id = $1`, [
+      userId,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const user = result.rows[0];
+    const userDetails = {
+      username: user.username,
+      email: user.email,
+    };
+
+    res.status(200).send(user);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Database Error" });
   }
 };
