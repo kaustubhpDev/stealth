@@ -40,7 +40,7 @@ exports.login = async (req, res) => {
       return res.status(401).send({ message: "Incorrect password" });
     }
     const token = jwt.sign({ hrId: hr.id, email: hr.email }, process.env.JWT_SECRET);
-    return res.status(200).send({ token });
+    return res.status(200).send({ token, user: hr });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: "Database Error" });
