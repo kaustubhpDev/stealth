@@ -33,14 +33,12 @@ exports.isAuthenticatedHR = CatchAsyncError(async (req, res, next) => {
         return res.status(403).send('A token is required for authentication');
     }
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const hrId = decodedToken.hrId;
 
-        const result = await client.query(`SELECT * FROM hr WHERE id = $1`, [
-            userId,
-        ]);
+        const result = await client.query(`SELECT * FROM hr WHERE id = $1`, [hrId]);
         if (result.rows.length === 0) {
-            return res.status(404).send({ message: "User not found" });
+            return res.status(404).send({ message: "HR not found" });
         }
         req.user = result.rows[0];
     } catch (err) {

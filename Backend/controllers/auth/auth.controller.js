@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
       { userId: user.id, username: user.email },
       process.env.JWT_SECRET
     );
-    return res.status(200).send({ token, username });
+    return res.status(200).send({ token, user });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ message: "Database Error" });
@@ -62,7 +62,6 @@ exports.login = async (req, res) => {
 };
 exports.verifyuser = async (req, res) => {
   try {
-    console.log(req.user)
     const user = req.user;
     res.status(200).send({ user });
   } catch (err) {
