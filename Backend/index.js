@@ -8,7 +8,6 @@ const client = require("./config/dbConfig");
 const server = require("http").createServer(app);
 require("dotenv").config();
 const { connection } = require("./config/Db");
-const mongoose = require("mongoose");
 // const auth = require("./routes/userRoutes");
 const chat = require("./routes/messageRoutes");
 

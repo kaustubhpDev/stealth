@@ -1,3 +1,5 @@
+const { isAuthenticatedUser } = require("../middlewares/Auth");
+
 module.exports = (app) => {
   const auth = require("../controllers/auth/auth.controller");
   var router = require("express").Router();
