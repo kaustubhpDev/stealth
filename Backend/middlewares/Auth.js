@@ -2,6 +2,7 @@ const ErrorHandler = require("../utils/errorHandelr");
 const jwt = require("jsonwebtoken");
 const CatchAsyncError = require("./CatchAsyncError");
 const user = require("../model/User");
+const client = require("../config/dbConfig");
 
 
 exports.isAuthenticatedUser = CatchAsyncError(async (req, res, next) => {
@@ -11,9 +12,17 @@ exports.isAuthenticatedUser = CatchAsyncError(async (req, res, next) => {
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await user.findById(decoded.id);
+        const userId = decoded.userId;
+
+        const result = await client.query(`SELECT * FROM users WHERE id = $1`, [
+            userId,
+        ]);
+        if (result.rows.length === 0) {
+            return res.status(404).send({ message: "User not found" });
+        }
+        req.user = result.rows[0];
     } catch (err) {
-        return res.status(401).send('Invalid Token');
+        return res.status(401).send(err.message);
     }
     return next();
 

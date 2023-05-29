@@ -51,8 +51,8 @@ exports.login = async (req, res) => {
       return res.status(401).send({ message: "Incorrect password" });
     }
     const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      config.secret
+      { userId: user.id, username: user.email },
+      process.env.JWT_SECRET
     );
     return res.status(200).send({ token, username });
   } catch (err) {
@@ -61,27 +61,10 @@ exports.login = async (req, res) => {
   }
 };
 exports.verifyuser = async (req, res) => {
-  const token =
-    req.body.token || req.query.token || req.headers["x-access-token"];
   try {
-    console.log(token);
-    const decodedToken = jwt.verify(token, config.secret);
-    const userId = decodedToken.userId;
-
-    const result = await client.query(`SELECT * FROM users WHERE id = $1`, [
-      userId,
-    ]);
-    if (result.rows.length === 0) {
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    const user = result.rows[0];
-    const userDetails = {
-      username: user.username,
-      email: user.email,
-    };
-
-    res.status(200).send(user);
+    console.log(req.user)
+    const user = req.user;
+    res.status(200).send({ user });
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Database Error" });
