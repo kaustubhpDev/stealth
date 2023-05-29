@@ -44,12 +44,9 @@ exports.addQuestion = async (req, res) => {
       "INSERT INTO questions (question_level, question_value, question_answer,question_options,question_domain) VALUES ($1, $2, $3,$4,$5) RETURNING *",
       [level, question, answer, options, domain]
     );
-    const res = newQuestion.rows[0];
+
     // Return the inserted row to the client
-    res.json({
-      message: "saved",
-      res: res,
-    });
+    res.json({ message: "saved", data: newQuestion.rows[0] });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error inserting new question" });
