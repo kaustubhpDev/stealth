@@ -47,24 +47,11 @@ exports.login = async (req, res) => {
   }
 };
 exports.verifyhr = async (req, res) => {
-  const token =
-    req.body.token || req.query.token || req.headers["x-access-token"];
   try {
-    const decodedToken = jwt.verify(token, config.secret);
-    const hrId = decodedToken.hrId;
 
-    const result = await client.query(`SELECT * FROM hr WHERE id = $1`, [hrId]);
-    if (result.rows.length === 0) {
-      return res.status(404).send({ message: "HR not found" });
-    }
+    const hrDetails = req.user
 
-    const hr = result.rows[0];
-    const hrDetails = {
-      username: hr.username,
-      email: hr.email,
-    };
-
-    res.status(200).send(hrDetails);
+    res.status(200).send({ user: hrDetails });
   } catch (err) {
     console.log(err);
     res.status(500).send({ message: "Database Error" });
