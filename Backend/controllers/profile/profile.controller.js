@@ -165,3 +165,29 @@ exports.getUsersWithDetails = async (req, res) => {
     res.status(500).json({ message: "Error fetching users with details" });
   }
 };
+exports.getUserDetails = async (req, res) => {
+  try {
+    const userId = req.body.userId; // Assuming the user ID is provided as a URL parameter
+
+    // Fetch the details for the specified user ID
+    const query = `
+      SELECT *
+      FROM users u
+      LEFT JOIN skills s ON u.id = s.user_id
+      LEFT JOIN education e ON u.id = e.user_id
+      LEFT JOIN experience x ON u.id = x.user_id
+      LEFT JOIN preference p ON u.id = p.user_id
+      LEFT JOIN badges b ON u.id = b.user_id
+      WHERE u.id = $1`;
+    const result = await client.query(query, [userId]);
+    const userDetails = result.rows[0]; // Assuming there will be only one matching user
+
+    res.json({
+      message: "User details fetched successfully",
+      data: userDetails,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching user details" });
+  }
+};

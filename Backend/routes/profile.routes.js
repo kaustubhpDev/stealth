@@ -19,6 +19,9 @@ module.exports = (app) => {
   router.get("/profile/userdetails", function (req, res) {
     profile.getUsersWithDetails(req, res);
   });
+  router.post("/profile/userdetailsbyid", function (req, res) {
+    profile.getUserDetails(req, res);
+  });
 
   app.use("/api", router);
 };
