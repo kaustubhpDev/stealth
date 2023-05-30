@@ -46,7 +46,7 @@ exports.updateAssignmentSubmission = async (req, res) => {
     const { student_id, assignment_id, submission_url } = req.body;
 
     const checkQuery = `
-      SELECT assignment_started_date
+      SELECT assignment_started
       FROM assignment_submission
       WHERE student_id = $1 AND assignment_id = $2
       ORDER BY assignment_started DESC
