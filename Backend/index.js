@@ -32,6 +32,7 @@ require("./routes/takehome.routes")(app);
 require("./routes/hrauth.routes")(app);
 require("./routes/hr.routes")(app);
 require("./routes/profile.routes")(app);
+require("./routes/badge.routes")(app);
 
 app.listen(port, () => {
   console.log(`server is running on port ${port}`), connection();

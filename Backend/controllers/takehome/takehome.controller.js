@@ -112,7 +112,8 @@ exports.getPendingAssignmentSubmissions = async (req, res) => {
         a.assignment_domain,
         a.assignment_level,
         s.student_id,
-        s.submission_url
+        s.submission_url,
+        s.submission_id
       FROM
         assignment AS a
         JOIN assignment_submission AS s ON a.assignment_id = s.assignment_id
@@ -129,6 +130,7 @@ exports.getPendingAssignmentSubmissions = async (req, res) => {
       assignmentLevel: row.assignment_level,
       studentId: row.student_id,
       submissionUrl: row.submission_url,
+      submissionId: row.submission_id,
     }));
 
     res.status(200).json({ submissions });
