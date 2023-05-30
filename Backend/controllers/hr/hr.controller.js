@@ -3,13 +3,13 @@ exports.createJob = async (req, res) => {
   try {
     const {
       hr_id,
-      title,
+      jobTitle,
       date,
       budget,
       skills,
-      job_description,
-      job_responsibilities,
-      job_perks,
+      jobDescription,
+      jobRoles,
+      jobPerks,
       experience,
     } = req.body;
 
@@ -21,13 +21,13 @@ exports.createJob = async (req, res) => {
 
     const values = [
       hr_id,
-      title,
+      jobTitle,
       date,
       budget,
       skills,
-      job_description,
-      job_responsibilities,
-      job_perks,
+      jobDescription,
+      jobRoles,
+      jobPerks,
       experience,
     ];
 
@@ -81,8 +81,7 @@ exports.saveInterviewedCandidate = async (req, res) => {
 };
 exports.saveShortlistedCandidate = async (req, res) => {
   try {
-    const { user_id, hr_id, job_id, shortlist_date, shortlist_reason } =
-      req.body;
+    const { user_id, hr_id, job_id, shortlist_date } = req.body;
 
     // Insert the shortlisted candidate into the database
     const query = `
@@ -104,3 +103,14 @@ exports.saveShortlistedCandidate = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.getAllJobs = async (req, res) => {
+  try {
+    const result = await client.query("SELECT * FROM jobs");
+    const jobs = result.rows;
+    res.status(200).json({ jobs });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch assignments" });
+  }
+};
+exports.getCandidateBySkillsExp = async (req, res) => {};
