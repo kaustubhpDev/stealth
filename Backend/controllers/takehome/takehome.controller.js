@@ -25,7 +25,7 @@ exports.downloadTakeHomeAssignment = async (req, res) => {
     const { student_id, assignment_id, assignment_started_date } = req.body;
 
     const insertQuery =
-      "INSERT INTO assignment_submission (user_id, assignment_id, assignment_started_date) VALUES ($1, $2, $3) RETURNING submission_id";
+      "INSERT INTO assignment_submission (student_id, assignment_id, assignment_started) VALUES ($1, $2, $3) RETURNING submission_id";
     const values = [student_id, assignment_id, assignment_started_date];
 
     const queryResult = await client.query(insertQuery, values);
@@ -48,8 +48,8 @@ exports.updateAssignmentSubmission = async (req, res) => {
     const checkQuery = `
       SELECT assignment_started_date
       FROM assignment_submission
-      WHERE user_id = $1 AND assignment_id = $2
-      ORDER BY assignment_started_date DESC
+      WHERE student_id = $1 AND assignment_id = $2
+      ORDER BY assignment_started DESC
       LIMIT 1
     `;
     const checkResult = await client.query(checkQuery, [
@@ -61,7 +61,7 @@ exports.updateAssignmentSubmission = async (req, res) => {
       return res.status(400).json({ message: "Assignment not found" });
     }
 
-    const assignmentStartedDate = checkResult.rows[0].assignment_started_date;
+    const assignmentStartedDate = checkResult.rows[0].assignment_started;
     const threeDaysAgo = new Date();
     threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
 
@@ -74,7 +74,7 @@ exports.updateAssignmentSubmission = async (req, res) => {
     const updateQuery = `
       UPDATE assignment_submission
       SET submission_url = $1
-      WHERE user_id = $2 AND assignment_id = $3
+      WHERE student_id = $2 AND assignment_id = $3
     `;
     await client.query(updateQuery, [
       submission_url,
