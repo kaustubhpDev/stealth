@@ -10,11 +10,12 @@ exports.createJob = async (req, res) => {
       job_description,
       job_responsibilities,
       job_perks,
+      experience,
     } = req.body;
 
     const query = `
-      INSERT INTO jobs (hr_id, title, date, budget, skills, job_description, job_responsibilities, job_perks)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO jobs (hr_id, title, date, budget, skills, job_description, job_responsibilities, job_perks,experience)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8,$9)
       RETURNING *
     `;
 
@@ -27,6 +28,7 @@ exports.createJob = async (req, res) => {
       job_description,
       job_responsibilities,
       job_perks,
+      experience,
     ];
 
     const result = await client.query(query, values);
