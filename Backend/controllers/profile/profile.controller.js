@@ -151,7 +151,7 @@ exports.getUsersWithDetails = async (req, res) => {
       LEFT JOIN skills s ON u.id = s.user_id
       LEFT JOIN education e ON u.id = e.user_id
       LEFT JOIN experience x ON u.id = x.user_id
-      LEFT JOIN preference p ON u.id = p.user_id
+      LEFT JOIN preferences p ON u.id = p.user_id
       LEFT JOIN badges b ON u.id = b.user_id`;
     const result = await client.query(query);
     const usersWithDetails = result.rows;
@@ -176,7 +176,7 @@ exports.getUserDetails = async (req, res) => {
       LEFT JOIN skills s ON u.id = s.user_id
       LEFT JOIN education e ON u.id = e.user_id
       LEFT JOIN experience x ON u.id = x.user_id
-      LEFT JOIN preference p ON u.id = p.user_id
+      LEFT JOIN preferences p ON u.id = p.user_id
       LEFT JOIN badges b ON u.id = b.user_id
       WHERE u.id = $1`;
     const result = await client.query(query, [userId]);
