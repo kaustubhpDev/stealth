@@ -13,6 +13,9 @@ module.exports = (app) => {
   router.post("/profile/savepreferences", function (req, res) {
     profile.savePreferences(req, res);
   });
+  router.post("/profile/savedescription", function (req, res) {
+    profile.saveUserDescription(req, res);
+  });
 
   app.use("/api", router);
 };

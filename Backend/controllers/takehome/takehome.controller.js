@@ -37,3 +37,13 @@ exports.submittakehomeassignment = async (req, res) => {
     res.status(500).json({ message: "Error saving assignment submission" });
   }
 };
+exports.getAllAssignments = async (req, res) => {
+  try {
+    const result = await client.query("SELECT * FROM assignment");
+    const assignments = result.rows;
+    res.status(200).json({ assignments });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch assignments" });
+  }
+};

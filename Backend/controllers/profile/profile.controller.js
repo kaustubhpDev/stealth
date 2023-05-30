@@ -122,3 +122,26 @@ exports.savePreferences = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.getProfileDetails = async (req, res) => {};
+
+exports.saveUserDescription = async (req, res) => {
+  const { description, github, linkedin, portfolio, userId } = req.body;
+
+  try {
+    const result = await client.query(
+      `INSERT INTO user_description (description, github, linkedin, portfolio, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [description, github, linkedin, portfolio, userId]
+    );
+
+    res
+      .status(200)
+      .json({
+        message: "User description saved successfully",
+        data: result.rows[0],
+      });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error saving user description" });
+  }
+};

@@ -6,5 +6,9 @@ module.exports = (app) => {
     takehomeassignment.savetakehomeassignment(req, res);
   });
 
+  router.get("/assignment/getassignments", function (req, res) {
+    takehomeassignment.getAllAssignments(req, res);
+  });
+
   app.use("/api", router);
 };
