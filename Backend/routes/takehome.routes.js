@@ -16,6 +16,8 @@ module.exports = (app) => {
   router.get("/assignment/getassignments", function (req, res) {
     takehomeassignment.getAllAssignments(req, res);
   });
-
+  router.get("/assignment/submissions", function (req, res) {
+    takehomeassignment.getPendingAssignmentSubmissions(req, res);
+  });
   app.use("/api", router);
 };

@@ -23,9 +23,12 @@ exports.savetakehomeassignment = async (req, res) => {
 exports.downloadTakeHomeAssignment = async (req, res) => {
   try {
     const { student_id, assignment_id, assignment_started_date } = req.body;
+    console.log(assignment_id);
+    console.log(student_id);
+    console.log(assignment_started_date);
 
     const insertQuery =
-      "INSERT INTO assignment_submission (student_id, assignment_id, assignment_started) VALUES ($1, $2, $3) RETURNING submission_id";
+      "INSERT INTO assignment_submission (student_id, assignment_id, assignment_date) VALUES ($1, $2, $3) RETURNING submission_id";
     const values = [student_id, assignment_id, assignment_started_date];
 
     const queryResult = await client.query(insertQuery, values);
@@ -46,10 +49,10 @@ exports.updateAssignmentSubmission = async (req, res) => {
     const { student_id, assignment_id, submission_url } = req.body;
 
     const checkQuery = `
-      SELECT assignment_started
+      SELECT assignment_date
       FROM assignment_submission
       WHERE student_id = $1 AND assignment_id = $2
-      ORDER BY assignment_started DESC
+      ORDER BY assignment_date DESC
       LIMIT 1
     `;
     const checkResult = await client.query(checkQuery, [
