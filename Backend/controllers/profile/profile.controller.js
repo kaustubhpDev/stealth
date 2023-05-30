@@ -123,8 +123,6 @@ exports.savePreferences = async (req, res) => {
   }
 };
 
-exports.getProfileDetails = async (req, res) => {};
-
 exports.saveUserDescription = async (req, res) => {
   const { description, github, linkedin, portfolio, userId } = req.body;
 
@@ -134,14 +132,36 @@ exports.saveUserDescription = async (req, res) => {
       [description, github, linkedin, portfolio, userId]
     );
 
-    res
-      .status(200)
-      .json({
-        message: "User description saved successfully",
-        data: result.rows[0],
-      });
+    res.status(200).json({
+      message: "User description saved successfully",
+      data: result.rows[0],
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error saving user description" });
+  }
+};
+
+exports.getUsersWithDetails = async (req, res) => {
+  try {
+    // Fetch the list of users with their details
+    const query = `
+      SELECT *
+      FROM users u
+      LEFT JOIN skills s ON u.id = s.user_id
+      LEFT JOIN education e ON u.id = e.user_id
+      LEFT JOIN experience x ON u.id = x.user_id
+      LEFT JOIN preference p ON u.id = p.user_id
+      LEFT JOIN badges b ON u.id = b.user_id`;
+    const result = await client.query(query);
+    const usersWithDetails = result.rows;
+
+    res.json({
+      message: "Users with details fetched successfully",
+      data: usersWithDetails,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching users with details" });
   }
 };

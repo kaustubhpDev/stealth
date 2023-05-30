@@ -16,6 +16,9 @@ module.exports = (app) => {
   router.post("/profile/savedescription", function (req, res) {
     profile.saveUserDescription(req, res);
   });
+  router.get("/profile/userdetails", function (req, res) {
+    profile.getUsersWithDetails(req, res);
+  });
 
   app.use("/api", router);
 };

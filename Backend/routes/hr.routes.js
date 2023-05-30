@@ -13,6 +13,12 @@ module.exports = (app) => {
   router.post("/hr/shortlist", function (req, res) {
     hr.saveShortlistedCandidate(req, res);
   });
+  router.post("/hr/filtercandidates", function (req, res) {
+    hr.filterCandidates(req, res);
+  });
+  router.post("/hr/shortlistedjobs", function (req, res) {
+    hr.getShortlistedJobs(req, res);
+  });
 
   app.use("/api", router);
 };

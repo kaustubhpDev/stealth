@@ -113,4 +113,72 @@ exports.getAllJobs = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch assignments" });
   }
 };
-exports.getCandidateBySkillsExp = async (req, res) => {};
+exports.filterCandidates = async (req, res) => {
+  try {
+    const { skills, experience } = req.body;
+
+    const formattedSkills = skills.map((badge) => badge.toLowerCase()); // or .toUpperCase() if needed
+
+    const query = `
+      SELECT *
+      FROM badges
+      WHERE exists (
+        SELECT 1
+        FROM unnest(badge_list) badge
+        WHERE lower(badge) = any($1) -- or upper(badge) = any($1) if needed
+      )`;
+    const skillResult = await client.query(query, [formattedSkills]);
+
+    const userIds = skillResult.rows.map((badge) => badge.user_id);
+
+    const experienceQuery = `
+      SELECT *
+      FROM experience
+      WHERE years_of_experience >= $1
+        AND user_id = ANY($2)`;
+    const experienceResult = await client.query(experienceQuery, [
+      experience,
+      userIds,
+    ]);
+
+    const filteredCandidates = experienceResult.rows;
+
+    res.json({
+      message: "Filtered candidates fetched successfully",
+      data: filteredCandidates,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching filtered candidates" });
+  }
+};
+
+exports.getShortlistedJobs = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // Fetch the job IDs for which the student has been shortlisted
+    const query = `
+      SELECT job_id
+      FROM shortlisted_candidates
+      WHERE user_id = $1`;
+    const result = await client.query(query, [userId]);
+    const jobIds = result.rows.map((row) => row.job_id);
+
+    // Fetch the job details for the shortlisted jobs
+    const jobsQuery = `
+      SELECT *
+      FROM jobs
+      WHERE id = ANY($1)`;
+    const jobsResult = await client.query(jobsQuery, [jobIds]);
+    const shortlistedJobs = jobsResult.rows;
+
+    res.json({
+      message: "Shortlisted jobs fetched successfully",
+      data: shortlistedJobs,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching shortlisted jobs" });
+  }
+};
