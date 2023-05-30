@@ -19,6 +19,9 @@ module.exports = (app) => {
   router.post("/hr/shortlistedjobs", function (req, res) {
     hr.getShortlistedJobs(req, res);
   });
+  router.get("/hr/goblistedbyhr", function (req, res) {
+    hr.getAllJobs(req, res);
+  });
 
   app.use("/api", router);
 };
