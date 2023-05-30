@@ -3,15 +3,15 @@ const uploadfile = require("./uploadfile");
 
 exports.savetakehomeassignment = async (req, res) => {
   try {
-    const { name, domain, level, base64 } = req.body;
+    const { name, domain, level, base64, description } = req.body;
     const url = await uploadfile(base64);
     if (!url) {
       console.log("failed");
       return res.status(400).send({ error: "file upload failed" });
     }
     const newAssignment = await client.query(
-      "INSERT INTO assignment (assignment_name,assignment_domain,assignment_level,assignment_url) VALUES ($1, $2, $3,$4) RETURNING *",
-      [name, domain, level, url]
+      "INSERT INTO assignment (assignment_name,assignment_domain,assignment_level,assignment_url,description) VALUES ($1, $2, $3,$4,$5) RETURNING *",
+      [name, domain, level, url, description]
     );
     res.status(200).send({ message: "assignment uploaded successfully" });
   } catch (error) {
@@ -99,5 +99,40 @@ exports.getAllAssignments = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch assignments" });
+  }
+};
+exports.getPendingAssignmentSubmissions = async (req, res) => {
+  try {
+    const query = `
+      SELECT
+        a.assignment_name,
+        a.assignment_domain,
+        a.assignment_level,
+        s.student_id,
+        s.submission_url
+      FROM
+        assignment AS a
+        JOIN assignment_submission AS s ON a.assignment_id = s.assignment_id
+      WHERE
+        s.submission_url IS NOT NULL
+        AND s.reviewed = false
+    `;
+
+    const result = await client.query(query);
+
+    const submissions = result.rows.map((row) => ({
+      assignmentName: row.assignment_name,
+      assignmentDomain: row.assignment_domain,
+      assignmentLevel: row.assignment_level,
+      studentId: row.student_id,
+      submissionUrl: row.submission_url,
+    }));
+
+    res.status(200).json({ submissions });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Error retrieving pending assignment submissions" });
   }
 };
