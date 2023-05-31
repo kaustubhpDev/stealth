@@ -43,29 +43,15 @@ exports.createJob = async (req, res) => {
 
 exports.saveInterviewedCandidate = async (req, res) => {
   try {
-    const {
-      user_id,
-      hr_id,
-      job_id,
-      interview_date,
-      interview_round,
-      interview_result,
-    } = req.body;
-
+    const { user_id, hr_id, job_id } = req.body;
+    const interview_date = new Date();
     // Insert the interviewed candidate into the database
     const query = `
-        INSERT INTO interviewed_candidates (user_id, hr_id, job_id, interview_date, interview_round, interview_result)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO interviewed_candidates (user_id, hr_id, job_id, interview_date)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
-    const values = [
-      user_id,
-      hr_id,
-      job_id,
-      interview_date,
-      interview_round,
-      interview_result,
-    ];
+    const values = [user_id, hr_id, job_id, interview_date];
     const result = await client.query(query, values);
 
     const savedInterviewedCandidate = result.rows[0];
@@ -81,15 +67,15 @@ exports.saveInterviewedCandidate = async (req, res) => {
 };
 exports.saveShortlistedCandidate = async (req, res) => {
   try {
-    const { user_id, hr_id, job_id, shortlist_date } = req.body;
-
+    const { user_id, hr_id, job_id } = req.body;
+    const shortlist_date = new Date();
     // Insert the shortlisted candidate into the database
     const query = `
-        INSERT INTO shortlisted_candidates (user_id, hr_id, job_id, shortlist_date, shortlist_reason)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO shortlisted_candidates (user_id, hr_id, job_id, shortlist_date)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
       `;
-    const values = [user_id, hr_id, job_id, shortlist_date, shortlist_reason];
+    const values = [user_id, hr_id, job_id, shortlist_date];
     const result = await client.query(query, values);
 
     const savedShortlistedCandidate = result.rows[0];
@@ -115,54 +101,54 @@ exports.getAllJobs = async (req, res) => {
 };
 exports.filterCandidates = async (req, res) => {
   try {
-    const { skills, experience } = req.body;
+    const { skills } = req.body;
 
     const formattedSkills = skills.map((badge) => badge.toLowerCase()); // or .toUpperCase() if needed
 
     const query = `
       SELECT *
-      FROM badges
-      WHERE exists (
-        SELECT 1
-        FROM unnest(badge_list) badge
-        WHERE lower(badge) = any($1) -- or upper(badge) = any($1) if needed
-      )`;
-    const skillResult = await client.query(query, [formattedSkills]);
+      FROM (
+        SELECT *,
+          ROW_NUMBER() OVER (PARTITION BY u.id ORDER BY u.id, b.assigned_date DESC) AS rn
+        FROM users u
+        LEFT JOIN skills s ON u.id = s.user_id
+        LEFT JOIN education e ON u.id = e.user_id
+        LEFT JOIN experience x ON u.id = x.user_id
+        LEFT JOIN preferences p ON u.id = p.user_id
+        LEFT JOIN badges b ON u.id = b.user_id
+        WHERE exists (
+          SELECT 1
+          FROM unnest(badge_list) badge
+          WHERE lower(badge) = any($1) -- or upper(badge) = any($1) if needed
+        )
+      ) AS subquery
+      WHERE rn = 1`;
+    const result = await client.query(query, [formattedSkills]);
 
-    const userIds = skillResult.rows.map((badge) => badge.user_id);
-
-    const experienceQuery = `
-      SELECT *
-      FROM experience
-      WHERE years_of_experience >= $1
-        AND user_id = ANY($2)`;
-    const experienceResult = await client.query(experienceQuery, [
-      experience,
-      userIds,
-    ]);
-
-    const filteredCandidates = experienceResult.rows;
+    const usersWithDetails = result.rows;
 
     res.json({
-      message: "Filtered candidates fetched successfully",
-      data: filteredCandidates,
+      message: "Filtered candidates with details fetched successfully",
+      data: usersWithDetails,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error fetching filtered candidates" });
+    res
+      .status(500)
+      .json({ message: "Error fetching filtered candidates with details" });
   }
 };
 
 exports.getShortlistedJobs = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { user_id } = req.body;
 
     // Fetch the job IDs for which the student has been shortlisted
     const query = `
       SELECT job_id
       FROM shortlisted_candidates
       WHERE user_id = $1`;
-    const result = await client.query(query, [userId]);
+    const result = await client.query(query, [user_id]);
     const jobIds = result.rows.map((row) => row.job_id);
 
     // Fetch the job details for the shortlisted jobs
