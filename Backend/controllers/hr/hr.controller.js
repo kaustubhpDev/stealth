@@ -99,6 +99,21 @@ exports.getAllJobs = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch assignments" });
   }
 };
+exports.getSingleJobByID = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const query = "SELECT * FROM jobs WHERE id = $1";
+    const result = await client.query(query, [id]);
+
+    const job = result.rows;
+
+    res.status(200).json({ job });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch jobs" });
+  }
+};
 exports.getAllHrJobs = async (req, res) => {
   try {
     const { hr_id } = req.body;

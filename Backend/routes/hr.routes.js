@@ -22,6 +22,11 @@ module.exports = (app) => {
   router.get("/hr/joblisted", function (req, res) {
     hr.getAllJobs(req, res);
   });
+
+  router.get("/hr/getSingleJobByID/:id", function (req, res) {
+    hr.getSingleJobByID(req, res);
+  });
+
   router.post("/hr/joblistedbyhr", function (req, res) {
     hr.getAllHrJobs(req, res);
   });
