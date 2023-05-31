@@ -141,46 +141,188 @@ exports.saveUserDescription = async (req, res) => {
     res.status(500).json({ message: "Error saving user description" });
   }
 };
-
 exports.getUsersWithDetails = async (req, res) => {
   try {
-    // Fetch the list of users with their details
-    const query = `
+    // Fetch the list of users
+    const usersQuery = `
       SELECT *
-      FROM users u
-      LEFT JOIN skills s ON u.id = s.user_id
-      LEFT JOIN education e ON u.id = e.user_id
-      LEFT JOIN experience x ON u.id = x.user_id
-      LEFT JOIN preferences p ON u.id = p.user_id
-      LEFT JOIN badges b ON u.id = b.user_id`;
-    const result = await client.query(query);
-    const usersWithDetails = result.rows;
+      FROM users`;
+    const usersResult = await client.query(usersQuery);
+    const users = usersResult.rows;
+
+    // Fetch the latest entry from each related table for each user
+    const userDetails = await Promise.all(
+      users.map(async (user) => {
+        const userId = user.id;
+
+        const skillsQuery = `
+          SELECT *
+          FROM skills
+          WHERE user_id = $1
+          ORDER BY id DESC
+          LIMIT 1`;
+        const skillsResult = await client.query(skillsQuery, [userId]);
+        const skills =
+          skillsResult.rows.length > 0 ? skillsResult.rows[0] : null;
+
+        const educationQuery = `
+          SELECT *
+          FROM education
+          WHERE user_id = $1
+          ORDER BY id DESC
+          LIMIT 1`;
+        const educationResult = await client.query(educationQuery, [userId]);
+        const education =
+          educationResult.rows.length > 0 ? educationResult.rows[0] : null;
+
+        const experienceQuery = `
+          SELECT *
+          FROM experience
+          WHERE user_id = $1
+          ORDER BY id DESC
+          LIMIT 1`;
+        const experienceResult = await client.query(experienceQuery, [userId]);
+        const experience =
+          experienceResult.rows.length > 0 ? experienceResult.rows[0] : null;
+
+        const preferencesQuery = `
+          SELECT *
+          FROM preferences
+          WHERE user_id = $1
+          ORDER BY id DESC
+          LIMIT 1`;
+        const preferencesResult = await client.query(preferencesQuery, [
+          userId,
+        ]);
+        const preferences =
+          preferencesResult.rows.length > 0 ? preferencesResult.rows[0] : null;
+
+        const badgesQuery = `
+          SELECT *
+          FROM badges
+          WHERE user_id = $1
+          ORDER BY id DESC
+          LIMIT 1`;
+        const badgesResult = await client.query(badgesQuery, [userId]);
+        const badges =
+          badgesResult.rows.length > 0 ? badgesResult.rows[0] : null;
+
+        const userDetails = {
+          ...user,
+          skill: skills ? skills.skill : null,
+          role: skills ? skills.role : null,
+          willing_role: skills ? skills.willing_role : null,
+          degree_name: education ? education.degree_name : null,
+          college_name: education ? education.college_name : null,
+          start_date: education ? education.start_date : null,
+          end_date: education ? education.end_date : null,
+          company_name: experience ? experience.company_name : null,
+          job_title: experience ? experience.job_title : null,
+          job_description: experience ? experience.job_description : null,
+          job_seeking: preferences ? preferences.job_seeking : null,
+          job_type: preferences ? preferences.job_type : null,
+          job_location: preferences ? preferences.job_location : null,
+          company_size: preferences ? preferences.company_size : null,
+          desired_salary: preferences ? preferences.desired_salary : null,
+          badge_list: badges ? badges.badge_list : null,
+          assigned_date: badges ? badges.assigned_date : null,
+        };
+
+        return userDetails;
+      })
+    );
 
     res.json({
-      message: "Users with details fetched successfully",
-      data: usersWithDetails,
+      message: "Users details fetched successfully",
+      data: userDetails,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error fetching users with details" });
+    res.status(500).json({ message: "Error fetching users details" });
   }
 };
+
 exports.getUserDetails = async (req, res) => {
   try {
     const userId = req.body.userId; // Assuming the user ID is provided as a URL parameter
 
-    // Fetch the details for the specified user ID
-    const query = `
+    // Fetch the user details for the specified user ID
+    const userQuery = `
       SELECT *
-      FROM users u
-      LEFT JOIN skills s ON u.id = s.user_id
-      LEFT JOIN education e ON u.id = e.user_id
-      LEFT JOIN experience x ON u.id = x.user_id
-      LEFT JOIN preferences p ON u.id = p.user_id
-      LEFT JOIN badges b ON u.id = b.user_id
-      WHERE u.id = $1`;
-    const result = await client.query(query, [userId]);
-    const userDetails = result.rows[0]; // Assuming there will be only one matching user
+      FROM users
+      WHERE id = $1`;
+    const userResult = await client.query(userQuery, [userId]);
+    const user = userResult.rows[0]; // Assuming there will be only one matching user
+
+    // Fetch the latest entry from each related table for the retrieved user ID
+    const skillsQuery = `
+      SELECT *
+      FROM skills
+      WHERE user_id = $1
+      ORDER BY id DESC
+      LIMIT 1`;
+    const skillsResult = await client.query(skillsQuery, [userId]);
+    const skills = skillsResult.rows.length > 0 ? skillsResult.rows[0] : null;
+
+    const educationQuery = `
+      SELECT *
+      FROM education
+      WHERE user_id = $1
+      ORDER BY id DESC
+      LIMIT 1`;
+    const educationResult = await client.query(educationQuery, [userId]);
+    const education =
+      educationResult.rows.length > 0 ? educationResult.rows[0] : null;
+
+    const experienceQuery = `
+      SELECT *
+      FROM experience
+      WHERE user_id = $1
+      ORDER BY id DESC
+      LIMIT 1`;
+    const experienceResult = await client.query(experienceQuery, [userId]);
+    const experience =
+      experienceResult.rows.length > 0 ? experienceResult.rows[0] : null;
+
+    const preferencesQuery = `
+      SELECT *
+      FROM preferences
+      WHERE user_id = $1
+      ORDER BY id DESC
+      LIMIT 1`;
+    const preferencesResult = await client.query(preferencesQuery, [userId]);
+    const preferences =
+      preferencesResult.rows.length > 0 ? preferencesResult.rows[0] : null;
+
+    const badgesQuery = `
+      SELECT *
+      FROM badges
+      WHERE user_id = $1
+      ORDER BY id DESC
+      LIMIT 1`;
+    const badgesResult = await client.query(badgesQuery, [userId]);
+    const badges = badgesResult.rows.length > 0 ? badgesResult.rows[0] : null;
+
+    const userDetails = {
+      ...user,
+      skill: skills ? skills.skill : null,
+      role: skills ? skills.role : null,
+      willing_role: skills ? skills.willing_role : null,
+      degree_name: education ? education.degree_name : null,
+      college_name: education ? education.college_name : null,
+      start_date: education ? education.start_date : null,
+      end_date: education ? education.end_date : null,
+      company_name: experience ? experience.company_name : null,
+      job_title: experience ? experience.job_title : null,
+      job_description: experience ? experience.job_description : null,
+      job_seeking: preferences ? preferences.job_seeking : null,
+      job_type: preferences ? preferences.job_type : null,
+      job_location: preferences ? preferences.job_location : null,
+      company_size: preferences ? preferences.company_size : null,
+      desired_salary: preferences ? preferences.desired_salary : null,
+      badge_list: badges ? badges.badge_list : null,
+      assigned_date: badges ? badges.assigned_date : null,
+    };
 
     res.json({
       message: "User details fetched successfully",
