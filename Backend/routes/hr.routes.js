@@ -28,6 +28,12 @@ module.exports = (app) => {
   router.post("/hr/getshortlistedusersbyid", function (req, res) {
     hr.getShortlistedUsersWithDetails(req, res);
   });
+  router.get("/hr/getshortlistedcount", function (req, res) {
+    hr.getShortlistedCandidatesCount(req, res);
+  });
+  router.get("/hr/getreviewedcount", function (req, res) {
+    hr.getReviewedUsersCount(req, res);
+  });
 
   app.use("/api", router);
 };

@@ -253,3 +253,43 @@ exports.getShortlistedUsersWithDetails = async (req, res) => {
       .json({ message: "Error fetching shortlisted users with details" });
   }
 };
+
+exports.getShortlistedCandidatesCount = async (req, res) => {
+  try {
+    // Fetch the count of shortlisted candidates (one entry per user ID)
+    const query = `
+      SELECT COUNT(DISTINCT user_id) AS count
+      FROM shortlisted_candidates`;
+    const result = await client.query(query);
+    const count = result.rows[0].count;
+
+    res.json({
+      message: "Shortlisted candidates count fetched successfully",
+      data: count,
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Error fetching shortlisted candidates count" });
+  }
+};
+exports.getReviewedUsersCount = async (req, res) => {
+  try {
+    // Fetch the count of distinct user IDs from the assignment_submission table where reviewed is true
+    const query = `
+      SELECT COUNT(DISTINCT student_id) AS count
+      FROM assignment_submission
+      WHERE reviewed = true`;
+    const result = await client.query(query);
+    const count = result.rows[0].count;
+
+    res.json({
+      message: "Reviewed users count fetched successfully",
+      data: count,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching reviewed users count" });
+  }
+};
