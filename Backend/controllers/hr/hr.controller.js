@@ -199,3 +199,72 @@ exports.getShortlistedJobs = async (req, res) => {
     res.status(500).json({ message: "Error fetching shortlisted jobs" });
   }
 };
+
+exports.getShortlistedUsersWithDetails = async (req, res) => {
+  try {
+    const { job_id } = req.body;
+
+    // Fetch the user IDs who have been shortlisted for the given job ID
+    const query = `
+      SELECT user_id
+      FROM shortlisted_candidates
+      WHERE job_id = $1`;
+    const result = await client.query(query, [job_id]);
+    const userIds = result.rows.map((row) => row.user_id);
+
+    // Fetch the latest badge for each user
+    const badgesQuery = `
+      SELECT *
+      FROM badges
+      WHERE user_id = ANY($1)
+      ORDER BY id DESC
+      LIMIT 1`;
+    const badgesResult = await client.query(badgesQuery, [userIds]);
+    const badges = badgesResult.rows;
+
+    // Fetch the latest experience for each user
+    const experienceQuery = `
+      SELECT *
+      FROM experience
+      WHERE user_id = ANY($1)
+      ORDER BY id DESC
+      LIMIT 1`;
+    const experienceResult = await client.query(experienceQuery, [userIds]);
+    const experience = experienceResult.rows;
+
+    // Fetch the user details for the shortlisted users
+    const usersQuery = `
+      SELECT *
+      FROM users
+      WHERE id = ANY($1)`;
+    const usersResult = await client.query(usersQuery, [userIds]);
+    const users = usersResult.rows;
+
+    // Combine the fetched data to create the final response
+    const shortlistedUsersWithDetails = users.map((user) => {
+      const userBadges = badges.find((badge) => badge.user_id === user.id);
+      const userExperience = experience.find((exp) => exp.user_id === user.id);
+
+      return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        badge_list: userBadges ? userBadges.badge_list : null,
+        assigned_date: userBadges ? userBadges.assigned_date : null,
+        company_name: userExperience ? userExperience.company_name : null,
+        job_title: userExperience ? userExperience.job_title : null,
+        job_description: userExperience ? userExperience.job_description : null,
+      };
+    });
+
+    res.json({
+      message: "Shortlisted users with details fetched successfully",
+      data: shortlistedUsersWithDetails,
+    });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Error fetching shortlisted users with details" });
+  }
+};
