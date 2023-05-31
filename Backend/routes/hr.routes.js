@@ -25,6 +25,9 @@ module.exports = (app) => {
   router.post("/hr/joblistedbyhr", function (req, res) {
     hr.getAllHrJobs(req, res);
   });
+  router.post("/hr/getshortlistedusersbyid", function (req, res) {
+    hr.getShortlistedUsersWithDetails(req, res);
+  });
 
   app.use("/api", router);
 };
